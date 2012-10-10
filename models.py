@@ -4,7 +4,8 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 import re
 from pandas import *
-engine = create_engine('mysql://jfields:c@keandc00kies@localhost/cchdo_test')
+# Create an engine for yourself
+#engine = create_engine('mysql://user:password@localhost/cchdo_test')
 Base = declarative_base()
 
 class Click(Base):
