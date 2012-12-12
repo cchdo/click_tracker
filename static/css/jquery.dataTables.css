@@ -219,3 +219,8 @@ table.dataTable thead td:active {
 	-webkit-overflow-scrolling: touch;
 }
 
+/* Miscellaneous */
+select {
+    background-color: white;
+    border: 1px solid #a0a0a0;
+}
