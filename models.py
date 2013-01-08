@@ -1,12 +1,12 @@
-
-from sqlalchemy import create_engine, ForeignKey, Column, Integer, String, Date, DateTime 
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy import create_engine, Column, Integer, String, Date
 from sqlalchemy.ext.declarative import declarative_base
-import re
-from pandas import *
-# Create an engine for yourself
-#engine = create_engine('mysql://user:password@localhost/cchdo_test')
+
+
+engine = create_engine('sqlite:////srv/www/click_tracker/clicks.db')
+
+
 Base = declarative_base()
+
 
 class Click(Base):
     __tablename__ = 'clicks'
@@ -18,6 +18,7 @@ class Click(Base):
     location = Column(String(32))
     source_location = Column(String(32))
     file_type = Column(String(32))
+
 
 if __name__ == "__main__":
     print "Checking table settings."
