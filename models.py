@@ -3,9 +3,9 @@ from sqlalchemy import create_engine, ForeignKey, Column, Integer, String, Date,
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 import re
-from pandas import *
+#from pandas import *
 # Create an engine for yourself
-#engine = create_engine('mysql://user:password@localhost/cchdo_test')
+engine = create_engine('sqlite:////srv/www/click_tracker/clicks.db')
 Base = declarative_base()
 
 class Click(Base):
