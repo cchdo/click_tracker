@@ -1,5 +1,10 @@
 $ ->
-  $("#files").dataTable()
+  $("#files").dataTable
+    "sDom":'T<"clear">lfrtip'
+    "oTableTools":
+      "sSwfPath": 'media/swf/copy_csv_xls.swf'
+
+    
   $("#users").dataTable()
   get_latest = (types)->
     address = "http://localhost:5000/get_latest_" + types
@@ -12,6 +17,6 @@ $ ->
         $(selector).html("")
         $(selector).append(response)
       error: ->
-      timeout: 50000
+      timeout: 50001
   setInterval(get_latest("files"), 10000)
   setInterval(get_latest("users"), 10000)
