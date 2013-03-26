@@ -1,13 +1,6 @@
 $ ->
-  $("#files").dataTable
-    "sDom":'T<"clear">lfrtip'
-    "oTableTools":
-      "sSwfPath": 'media/swf/copy_csv_xls.swf'
-
-    
-  $("#users").dataTable()
   get_latest = (types)->
-    address = "http://localhost:5000/get_latest_" + types
+    address = "/get_latest_" + types
     selector = "#" + types + " tbody"
     $.ajax
       url: address
@@ -16,7 +9,13 @@ $ ->
       success: (response)->
         $(selector).html("")
         $(selector).append(response)
+        $("#"+types).dataTable
+          "sDom":'T<"clear">lfrtip'
+          "oTableTools":
+              "sSwfPath": 'static/swf/copy_csv_xls.swf'
+              "aButtons":    [ "csv", "xls" ] 
       error: ->
-      timeout: 50001
-  setInterval(get_latest("files"), 10000)
-  setInterval(get_latest("users"), 10000)
+      timeout: 900000
+
+  get_latest("files")
+  get_latest("users")
