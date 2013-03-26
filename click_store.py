@@ -9,6 +9,9 @@ from sqlalchemy.orm import sessionmaker
 
 import pygeoip
 
+from threading import Timer
+import thread, time, sys
+
 from crossdomain import *
 
 from models import *
@@ -19,6 +22,10 @@ app = Flask(__name__)
 Session = sessionmaker(bind=engine)
 
 GEOIP = pygeoip.GeoIP('GeoIP.dat')
+
+
+def timeout():
+    raise Exception
 
 
 @app.route('/show_clicks')
@@ -45,7 +52,7 @@ def get_latest_files():
 
 def _hostname_record(ip):
     if hasattr(socket, 'setdefaulttimeout'):
-        socket.setdefaulttimeout(0.1)
+        socket.setdefaulttimeout(0.005)
     try:
         hostname = socket.gethostbyaddr(ip)
     except Exception:
@@ -54,7 +61,10 @@ def _hostname_record(ip):
         hostname = hostname[0]
     else:
         hostname = 'unable to find'
-    dns_record = str(GEOIP.record_by_addr(ip))
+    try:
+        dns_record = str(GEOIP.record_by_addr(ip))
+    except:
+        dns_record = None
     return hostname, dns_record
 
 
@@ -62,7 +72,6 @@ def _hostname_record(ip):
 @crossdomain(origin='*')
 def get_latest_users():
     output = ""
-
     session = Session()
     users = session.query(distinct(Click.source_location)).all()
     for user in users:
@@ -70,9 +79,12 @@ def get_latest_users():
         if user_ip is None:
             continue
         count = session.query(Click).filter(Click.source_location == user_ip).count()
-        hostname, dns_record = _hostname_record(user_ip)
-        output += ('<tr><td>{0}</td><td>{1}</td><td>{2}</td><td><abbr title="{3}">hover for record</abbr></td>'
-            '<td></td></tr>').format(user_ip, count, hostname, dns_record)
+        try:
+            Timer(0.12, timeout).start()
+            hostname, dns_record = _hostname_record(user_ip)
+        except:
+            hostname = ""; dns_record = "";
+        output += ('<tr><td>{0}</td><td>{1}</td><td>{2}</td><td><abbr title="{3}">hover for record</abbr></td> <td></td></tr>').format(user_ip, count, hostname, dns_record)
     return output
 
 
