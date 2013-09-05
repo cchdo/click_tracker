@@ -93,7 +93,7 @@ def get_latest_users():
             formatted_dns = dns['city'] + ", " + dns['country_name']
         except:
             hostname = ""; dns_record = ""; formatted_dns = ""
-        output += ('<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>').format(user_ip, count, hostname, formatted_dns )
+        output += (u'<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>').format(user_ip, count, hostname, formatted_dns )
     return output
 
 
