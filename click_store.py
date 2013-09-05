@@ -7,6 +7,7 @@ from datetime import date
 from flask import *
 
 from sqlalchemy import distinct
+from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker
 
 import pygeoip
@@ -41,14 +42,12 @@ def get_latest_files():
     output = ""
 
     session = Session()
-    expocodes = session.query(distinct(Click.expocode)).all()
-    for expo in expocodes:
-        files = session.query(distinct(Click.file_type)).filter(Click.expocode == expo[0]).all()
-        for file in files:
-            count = session.query(Click).\
-                    filter(Click.expocode == expo[0], Click.file_type == file[0]).\
-                    count()
-            output += "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>".format(expo[0], file[0], count)
+    distinct_count = session.query(Click.expocode, Click.file_type,
+        func.count(Click.file_type)).group_by(Click.expocode,
+                Click.file_type).all()
+    for dc in distinct_count:
+        output += "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>".format(dc[0],
+                dc[1], dc[2])
     return output
 
 
@@ -80,12 +79,13 @@ def serve_click_tracker():
 def get_latest_users():
     output = ""
     session = Session()
-    users = session.query(distinct(Click.source_location)).all()
+    users = session.query(Click.source_location,
+            func.count(Click.source_location)).group_by(Click.source_location).all()
     for user in users:
         user_ip = user[0]
         if user_ip is None:
             continue
-        count = session.query(Click).filter(Click.source_location == user_ip).count()
+        count = user[1]
         try:
             Timer(0.12, timeout).start()
             hostname, dns_record = _hostname_record(user_ip)
