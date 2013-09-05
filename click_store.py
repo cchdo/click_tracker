@@ -1,6 +1,8 @@
 import json
 import re
 import socket
+import ast
+from datetime import date
 
 from flask import *
 
@@ -68,6 +70,11 @@ def _hostname_record(ip):
     return hostname, dns_record
 
 
+@app.route('/click_tracker.js')
+@crossdomain(origin='*')
+def serve_click_tracker():
+    return render_template('click_stats.js')
+
 @app.route('/get_latest_users')
 @crossdomain(origin='*')
 def get_latest_users():
@@ -82,15 +89,19 @@ def get_latest_users():
         try:
             Timer(0.12, timeout).start()
             hostname, dns_record = _hostname_record(user_ip)
+            dns = ast.literal_eval(dns_record)
+            formatted_dns = dns['city'] + ", " + dns['country_name']
         except:
-            hostname = ""; dns_record = "";
-        output += ('<tr><td>{0}</td><td>{1}</td><td>{2}</td><td><abbr title="{3}">hover for record</abbr></td> <td></td></tr>').format(user_ip, count, hostname, dns_record)
+            hostname = ""; dns_record = ""; formatted_dns = ""
+        output += ('<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>').format(user_ip, count, hostname, formatted_dns )
     return output
 
 
 @app.route('/', methods=['GET', 'POST'])
 @crossdomain(origin='*')
 def index():
+    if request.method == 'GET':
+        return redirect('/show_clicks')
     remote_addr = request.remote_addr 
     form = request.form
     st = ''.join(form.keys())
@@ -100,6 +111,7 @@ def index():
 	file_type = result['file_type']
 	new_click = Click()
 	new_click.expocode = expocode
+        new_click.date = date.today()
 	new_click.file_type = file_type
 	new_click.source_location = remote_addr
         session = Session()
